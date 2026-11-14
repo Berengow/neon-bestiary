@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://berengow.github.io/neon-bestiary/sitemap.xml

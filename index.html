@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Неоновый бестиарий — онлайн-выставка Юлии Деревцовой</title>
-  <meta name="description" content="Онлайн-выставка художницы Юлии Деревцовой: психоделические существа, глазастые сны, огненный заяц, радужный осьминог и тираннозавр в кружевах. 14 работ.">
+  <meta name="description" content="Онлайн-выставка художницы Юлии Деревцовой: 22 работы — психоделические существа, глазастые сны, огненный заяц, жар-птица, радужный осьминог и тираннозавр в кружевах.">
   <meta name="theme-color" content="#0c0910">
 
-  <!-- Превью для соцсетей. При переезде на другой адрес замените https://berengow.github.io/neon-bestiary/ ниже -->
+  <!-- Превью для соцсетей. При переезде на другой адрес замените https://berengow.github.io/neon-bestiary/ ниже и в js/data.js -->
   <link rel="canonical" href="https://berengow.github.io/neon-bestiary/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:url" content="https://berengow.github.io/neon-bestiary/">
   <meta property="og:site_name" content="Неоновый бестиарий">
   <meta property="og:title" content="Неоновый бестиарий — онлайн-выставка Юлии Деревцовой">
-  <meta property="og:description" content="Психоделические существа, глазастые сны и тираннозавр в кружевах. 14 работ — смотрите и делитесь!">
+  <meta property="og:description" content="Психоделические существа, глазастые сны и тираннозавр в кружевах. 22 работы — смотрите и делитесь!">
   <meta property="og:image" content="https://berengow.github.io/neon-bestiary/img/og-cover.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -26,10 +26,47 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/thumb/13.webp" type="image/webp">
 
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Интро «открывающийся глаз» — один раз за визит. Сам себя убирает через 2.6 с, даже если скрипты не загрузятся. -->
+  <script>
+    try {
+      if (!sessionStorage.getItem("nb-intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("intro-on");
+        sessionStorage.setItem("nb-intro", "1");
+        setTimeout(function () { document.documentElement.classList.add("intro-done"); }, 2600);
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
+  <div class="intro" id="intro" aria-hidden="true">
+    <svg class="intro__eye" viewBox="0 0 240 140">
+      <defs>
+        <clipPath id="introClip"><path d="M10,70 Q120,-14 230,70 Q120,154 10,70Z"/></clipPath>
+        <radialGradient id="introIris" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#e6ff3d"/><stop offset=".45" stop-color="#2ee6d6"/><stop offset="1" stop-color="#8b5cff"/>
+        </radialGradient>
+      </defs>
+      <path d="M10,70 Q120,-14 230,70 Q120,154 10,70Z" fill="#f6f1ea"/>
+      <g clip-path="url(#introClip)">
+        <g class="intro__look">
+          <circle cx="120" cy="70" r="40" fill="url(#introIris)"/>
+          <circle cx="120" cy="70" r="17" fill="#0c0910"/>
+          <circle cx="133" cy="57" r="7" fill="#fff"/>
+        </g>
+        <rect class="intro__lid intro__lid--top" x="0" y="-70" width="240" height="140" fill="#ff3d8b"/>
+        <rect class="intro__lid intro__lid--bot" x="0" y="70" width="240" height="140" fill="#ff3d8b"/>
+      </g>
+      <path d="M10,70 Q120,-14 230,70 Q120,154 10,70Z" fill="none" stroke="#ff3d8b" stroke-width="4"/>
+    </svg>
+    <p class="intro__title">Неоновый бестиарий</p>
+    <p class="intro__sub">выставка открывается…</p>
+  </div>
+
+  <div class="scrollbar" aria-hidden="true"><span id="scrollbar"></span></div>
   <div class="grain" aria-hidden="true"></div>
   <div class="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"><em>смотреть</em></span></div>
 
@@ -40,12 +77,25 @@
       <span>Юлия<br>Деревцова</span>
     </a>
     <nav class="nav__links" aria-label="Разделы">
-      <a href="#hall">Зал</a>
-      <a href="#collection">Коллекция</a>
-      <a href="#artist">Художница</a>
+      <a href="#hall" data-section="hall">Зал</a>
+      <a href="#collection" data-section="collection">Коллекция</a>
+      <a href="#artist" data-section="artist">Художница</a>
     </nav>
-    <a class="btn btn--small btn--glow" href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">Подписаться</a>
+    <div class="nav__right">
+      <a class="btn btn--small btn--glow nav__cta" href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">Подписаться</a>
+      <button class="burger" id="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+    </div>
   </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav class="menu__links" aria-label="Меню">
+      <a href="#hall"><small>01</small>Главный зал</a>
+      <a href="#collection"><small>02</small>Вся коллекция</a>
+      <a href="#artist"><small>03</small>Художница</a>
+      <a href="#join"><small>04</small>Поддержать</a>
+    </nav>
+    <a class="btn btn--glow btn--big" href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">Подписаться ВКонтакте</a>
+  </div>
 
   <main id="top">
     <!-- ============ HERO ============ -->
@@ -58,13 +108,13 @@
       </div>
 
       <div class="hero__text">
-        <p class="eyebrow reveal"><span class="pulse"></span> Онлайн-выставка · 14 работ</p>
+        <p class="eyebrow reveal"><span class="pulse"></span> Онлайн-выставка · <span data-total>22 работы</span></p>
         <h1 class="hero__title reveal">
           <span class="line">Неоновый</span>
           <span class="line line--grad">бестиарий</span>
         </h1>
         <p class="hero__lead reveal">
-          Здесь заяц плачет ледяными каплями, у губ вырастают глаза, а&nbsp;тираннозавр носит кружево.
+          Здесь заяц плачет ледяными каплями, жар-птица подглядывает из-за крыла, а&nbsp;тираннозавр носит кружево.
           Персональная выставка <strong>Юлии Деревцовой</strong>&nbsp;— художницы, чьи существа всегда смотрят на&nbsp;зрителя в&nbsp;ответ.
         </p>
         <div class="hero__cta reveal">
@@ -73,55 +123,63 @@
         </div>
       </div>
 
-      <div class="hero__stage" aria-hidden="true">
-        <figure class="float-card float-card--a" data-depth="0.6" data-open="12"><img src="img/thumb/12.jpg" alt=""></figure>
-        <figure class="float-card float-card--b" data-depth="1.2" data-open="13"><img src="img/thumb/13.jpg" alt=""></figure>
-        <figure class="float-card float-card--c" data-depth="0.9" data-open="14"><img src="img/thumb/14.jpg" alt=""></figure>
-        <figure class="float-card float-card--d" data-depth="1.6" data-open="05"><img src="img/thumb/05.jpg" alt=""></figure>
+      <div class="hero__stage" id="heroStage" aria-hidden="true">
+        <figure class="float-card float-card--a" data-depth="0.6" data-open="12"><picture><source type="image/webp" srcset="img/thumb/12.webp"><img src="img/thumb/12.jpg" alt=""></picture></figure>
+        <figure class="float-card float-card--b" data-depth="1.2" data-open="13"><picture><source type="image/webp" srcset="img/thumb/13.webp"><img src="img/thumb/13.jpg" alt="" fetchpriority="high"></picture></figure>
+        <figure class="float-card float-card--c" data-depth="0.9" data-open="14"><picture><source type="image/webp" srcset="img/thumb/14.webp"><img src="img/thumb/14.jpg" alt=""></picture></figure>
+        <figure class="float-card float-card--d" data-depth="1.6" data-open="16"><picture><source type="image/webp" srcset="img/thumb/16.webp"><img src="img/thumb/16.jpg" alt=""></picture></figure>
       </div>
 
       <a class="hero__scroll" href="#hall" aria-label="Листать вниз"><span></span></a>
     </section>
 
-    <!-- ============ БЕГУЩАЯ СТРОКА ============ -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
-        <span>Порычим?</span><i>✺</i><span>Существа</span><i>✺</i><span>Глаза</span><i>✺</i><span>Сны</span><i>✺</i><span>Прррисоединяйся!</span><i>✺</i>
-        <span>Порычим?</span><i>✺</i><span>Существа</span><i>✺</i><span>Глаза</span><i>✺</i><span>Сны</span><i>✺</i><span>Прррисоединяйся!</span><i>✺</i>
+    <!-- ============ ПЕРЕКРЁСТНЫЕ ЛЕНТЫ ============ -->
+    <div class="tapes" aria-hidden="true">
+      <div class="tape tape--acid">
+        <div class="tape__track">
+          <span>Порычим?</span><i>✺</i><span>Существа</span><i>✺</i><span>Глаза</span><i>✺</i><span>Сны</span><i>✺</i><span>Прррисоединяйся!</span><i>✺</i>
+          <span>Порычим?</span><i>✺</i><span>Существа</span><i>✺</i><span>Глаза</span><i>✺</i><span>Сны</span><i>✺</i><span>Прррисоединяйся!</span><i>✺</i>
+        </div>
+      </div>
+      <div class="tape tape--pink">
+        <div class="tape__track" id="titlesTape"></div>
       </div>
     </div>
 
     <!-- ============ ЗАЛ I: ГОРИЗОНТАЛЬНАЯ ЭКСПОЗИЦИЯ ============ -->
     <section class="hall" id="hall" aria-labelledby="hall-title">
-      <div class="hall__sticky">
+      <div class="hall__sticky" id="hallSticky">
         <div class="hall__head">
           <p class="eyebrow">Зал I</p>
           <h2 id="hall-title" class="h2">Главные работы</h2>
-          <p class="hall__hint">Листайте — картины проплывут мимо вас <span aria-hidden="true">→</span></p>
+          <p class="hall__counter" aria-hidden="true"><b id="hallNow">01</b><span id="hallAll">/ 11</span></p>
         </div>
         <div class="hall__viewport">
           <div class="hall__track" id="hallTrack"></div>
         </div>
-        <div class="hall__progress" aria-hidden="true"><span id="hallProgress"></span></div>
+        <div class="hall__foot">
+          <div class="hall__progress" aria-hidden="true"><span id="hallProgress"></span></div>
+          <p class="hall__hint">Листайте — картины проплывут мимо вас <span aria-hidden="true">→</span></p>
+        </div>
       </div>
     </section>
 
     <!-- ============ ИНТЕРЛЮДИЯ ============ -->
     <section class="interlude">
-      <div class="interlude__img reveal" data-open="01">
-        <img src="img/full/01.jpg" alt="Работа «Слушай глазами»: огромный глаз, зрачок которого похож на виниловую пластинку" loading="lazy" width="960" height="658">
+      <div class="interlude__img reveal" data-open="01" data-cursor="смотреть">
+        <picture><source type="image/webp" srcset="img/full/01.webp"><img src="img/full/01.jpg" alt="Работа «Слушай глазами»: огромный глаз, зрачок которого похож на виниловую пластинку" loading="lazy" width="960" height="658"></picture>
       </div>
       <div class="interlude__text reveal">
         <p class="eyebrow">О чём эта выставка</p>
         <blockquote class="quote">Картины, которые <em>смотрят в&nbsp;ответ</em></blockquote>
         <p>
-          Глаза у Юлии повсюду: в зрачке крутится пластинка, в улыбке прячется ещё один взгляд, у радужного монстра их&nbsp;десяток.
+          Глаза у Юлии повсюду: в зрачке крутится пластинка, жар-птица подглядывает из-за крыла, у радужного монстра их&nbsp;десяток.
           Её мир&nbsp;— это бестиарий из снов, детских книжек и кислотной вечеринки, где страшное и нежное живут рядом.
         </p>
         <ul class="stats">
-          <li><b>14</b><span>работ на выставке</span></li>
-          <li><b>1</b><span>тираннозавр в кружевах</span></li>
-          <li><b>∞</b><span>глаз, следящих за вами</span></li>
+          <li><b data-count="22">22</b><span data-total-label>работы на выставке</span></li>
+          <li><b data-count="1">1</b><span>тираннозавр в кружевах</span></li>
+          <li class="stats__eye"><span class="eye-slot" data-eye="#2ee6d6"></span><span>глаз следит за вами прямо сейчас</span></li>
         </ul>
       </div>
     </section>
@@ -131,7 +189,15 @@
       <div class="section-head reveal">
         <p class="eyebrow">Зал II</p>
         <h2 id="collection-title" class="h2">Вся коллекция</h2>
-        <div class="filters" id="filters" role="tablist" aria-label="Фильтр работ"></div>
+        <div class="filters" id="filters" role="group" aria-label="Фильтр работ"></div>
+      </div>
+      <div class="toolbar reveal">
+        <div class="seg" role="group" aria-label="Порядок работ">
+          <button type="button" data-sort="order" aria-pressed="true">По порядку</button>
+          <button type="button" data-sort="hue" aria-pressed="false"><span class="seg__rainbow" aria-hidden="true"></span>Радугой</button>
+        </div>
+        <p class="toolbar__count" id="gridCount" aria-live="polite"></p>
+        <button class="btn btn--ghost btn--small" type="button" id="randomBtn"><span aria-hidden="true">🎲</span> Случайная работа</button>
       </div>
       <div class="masonry" id="grid"></div>
     </section>
@@ -152,7 +218,7 @@
         <p class="eyebrow">Художница</p>
         <h2 id="artist-title" class="h2">Юлия Деревцова</h2>
         <p class="lead">
-          Рисует существ, которых не встретишь в энциклопедии: ангельских котов, улетающие грибы, ледяных зайцев и&nbsp;губы с глазами.
+          Рисует существ, которых не встретишь в энциклопедии: ангельских котов, улетающие грибы, ледяных зайцев, огнегривых зверей и&nbsp;губы с глазами.
         </p>
         <p>
           В работах Юлии смешиваются маркеры, акварель, цветные карандаши и тонкий линер. Кислотные цвета соседствуют
@@ -163,6 +229,9 @@
           Талисман и подпись художницы&nbsp;— «ТрС», Тираннозавр секс: обаятельная динозавриха, которая встречает гостей в&nbsp;сообществе.
           Там первыми появляются новые работы.
         </p>
+        <ul class="techs" aria-label="Техники">
+          <li>маркеры</li><li>акварель</li><li>цветные карандаши</li><li>линер</li><li>дотворк</li>
+        </ul>
         <div class="artist__links">
           <a class="btn btn--glow" href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">Сообщество «Тираннозавр секс»</a>
           <a class="btn btn--ghost" href="https://vk.ru/juliytree" target="_blank" rel="noopener">Страница Юлии</a>
@@ -171,9 +240,16 @@
     </section>
 
     <!-- ============ ПРИЗЫВ ============ -->
-    <section class="join" aria-labelledby="join-title">
+    <section class="join" id="join" aria-labelledby="join-title">
       <div class="join__card reveal">
         <div class="join__aura" aria-hidden="true"></div>
+        <div class="eyes-row" aria-hidden="true">
+          <span class="eye-slot" data-eye="#ff3d8b"></span>
+          <span class="eye-slot" data-eye="#e6ff3d"></span>
+          <span class="eye-slot eye-slot--big" data-eye="#2ee6d6"></span>
+          <span class="eye-slot" data-eye="#ff7a1a"></span>
+          <span class="eye-slot" data-eye="#8b5cff"></span>
+        </div>
         <p class="eyebrow">Поддержите художницу</p>
         <h2 id="join-title" class="join__title">Прррисоединяйся!</h2>
         <p class="join__lead">
@@ -195,18 +271,44 @@
   </main>
 
   <footer class="footer">
-    <p>© <span id="year"></span> Юлия Деревцова. Все работы защищены авторским правом — копирование и использование только с разрешения художницы.</p>
-    <p><a href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">vk.ru/tirannozavrrrsex</a></p>
+    <div class="footer__brand">
+      <img src="favicon.png" alt="" width="44" height="44" loading="lazy">
+      <p><b>Неоновый бестиарий</b><br>онлайн-выставка Юлии Деревцовой</p>
+    </div>
+    <nav class="footer__nav" aria-label="Разделы в подвале">
+      <a href="#hall">Главный зал</a>
+      <a href="#collection">Коллекция</a>
+      <a href="#artist">Художница</a>
+      <a href="https://vk.ru/tirannozavrrrsex" target="_blank" rel="noopener">ВКонтакте</a>
+    </nav>
+    <p class="footer__copy">© <span id="year"></span> Юлия Деревцова. Все работы защищены авторским правом — копирование и использование только с разрешения художницы.</p>
   </footer>
+
+  <button class="totop" id="totop" type="button" aria-label="Наверх">↑</button>
 
   <!-- ============ ЛАЙТБОКС ============ -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр работы" hidden>
+    <div class="lightbox__ambient" id="lbAmbient"></div>
     <div class="lightbox__bg"></div>
-    <button class="lb-btn lb-close" type="button" aria-label="Закрыть">✕</button>
-    <button class="lb-btn lb-prev" type="button" aria-label="Предыдущая работа">←</button>
-    <button class="lb-btn lb-next" type="button" aria-label="Следующая работа">→</button>
+
+    <div class="lb-top">
+      <p class="lb-counter" id="lbCounter"></p>
+      <div class="lb-tools">
+        <button class="lb-btn lb-play" type="button" aria-label="Слайд-шоу" aria-pressed="false" title="Слайд-шоу (пробел)"><span class="i-play">▶</span><span class="i-pause">❚❚</span></button>
+        <button class="lb-btn lb-zoom" type="button" aria-label="Увеличить" title="Увеличить (Z)">⤢</button>
+        <button class="lb-btn lb-full" type="button" aria-label="Во весь экран" title="Во весь экран (F)">⛶</button>
+        <button class="lb-btn lb-close" type="button" aria-label="Закрыть" title="Закрыть (Esc)">✕</button>
+      </div>
+    </div>
+    <div class="lb-timer" aria-hidden="true"><span></span></div>
+
+    <button class="lb-btn lb-nav lb-prev" type="button" aria-label="Предыдущая работа">←</button>
+    <button class="lb-btn lb-nav lb-next" type="button" aria-label="Следующая работа">→</button>
+
     <figure class="lightbox__figure">
-      <div class="lightbox__imgwrap"><img class="lightbox__img" alt=""></div>
+      <div class="lightbox__imgwrap" id="lbWrap" data-cursor="увеличить">
+        <img class="lightbox__img" id="lbImg" alt="" draggable="false">
+      </div>
       <figcaption class="lightbox__caption">
         <span class="lightbox__num"></span>
         <h3 class="lightbox__title"></h3>
@@ -216,8 +318,11 @@
           <a class="btn btn--small btn--glow" href="https://vk.ru/write266652611" target="_blank" rel="noopener">Спросить о работе</a>
           <button class="btn btn--small btn--ghost lb-share" type="button">Поделиться</button>
         </div>
+        <p class="lightbox__keys">← → листать · Z увеличить · пробел — слайд-шоу</p>
       </figcaption>
     </figure>
+
+    <div class="lb-strip" id="lbStrip" aria-label="Все работы"></div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
